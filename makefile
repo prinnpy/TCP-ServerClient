@@ -4,10 +4,10 @@
 #make
 #./matrix  (or whatever you call the TARGET)
 
-SOURCES = server.c
+SOURCES = client.c
 
 ######Change from matrix to (for example hw1) .#######
-TARGET = server
+TARGET = client
 
 #-------Do Not Change below this line-------------
 #Compile with g++
