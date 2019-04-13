@@ -1,4 +1,4 @@
-# Network Lab 2
+# CSCI3761 Network Lab 2
 
 ## Server side (Run this first)
 
