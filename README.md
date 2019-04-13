@@ -1,4 +1,4 @@
-# CSCI 3761 Network Lab 2
+# CSCI 3761: Network Lab 2
 
 - Upload server folder and client folder to csegrid
 
