@@ -5,7 +5,7 @@
 ### Server side (Run this first)
 
 - cd into server folder then type: make 
-  - To run server: `./server`
+- To run server: `./server`
 
 ```
 make
@@ -15,7 +15,7 @@ make
 ### Client side (Run this second)
 
 - cd into client folder then type: make
-  - To run client: `./client csci-gnode-01` <- The number "01" varies depending on your server terminal number. This is just a sample case where your server runs on @csci-gnode-01:~/server
+- To run client: `./client csci-gnode-01` <- The number "01" varies depending on your server terminal number. This is just a sample case where your server runs on @csci-gnode-01:~/server
   
 ```
 make
