@@ -49,6 +49,7 @@ For command options type: 'help'
 ```
 
 ##### Download files: `download`
+- DemoServer.txt and DemoClient.txt are included in its folder
 ```
 For command options type: 'help'
 > download
@@ -61,6 +62,7 @@ Enter download destination filename:
 ```
 
 ##### Upload files: `upload`
+- DemoServer.txt and DemoClient.txt are included in its folder
 ```
 For command options type: 'help'
 > upload
