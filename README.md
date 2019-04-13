@@ -86,5 +86,5 @@ For command options type: 'help'
 
 ## Status
 
-- 100% working!
+- 100% working locally and on csegrid!
 
