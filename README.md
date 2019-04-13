@@ -1,8 +1,8 @@
 # CSCI3761 Network Lab 2
 
-## Server side (Run this first)
-
 - Upload server folder and client folder to csegrid
+
+## Server side (Run this first)
 
 - cd into server folder then type: make 
   - To run server type: ./server
