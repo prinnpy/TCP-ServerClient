@@ -1,11 +1,7 @@
-//
-//  main.c
-//  server
-//
-//  Created by Hieu Nguyen on 3/20/19.
-//  Copyright © 2019 Hieu Nguyen. All rights reserved.
-//
-//  The code is based on Beej's Guide to Network Programming
+//Name: Prinn Prinyanut
+//Class: CSCI 3761
+//Description: lab 2 server
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -36,7 +32,9 @@ int main(void)
     struct sockaddr_in their_addr; // connector's address information
     char buf[MAXDATASIZE];
     int saved_stdout;
+    int saved_stdout2;
 
+    //print out server
     printf("------\n");
     printf("SERVER\n");
     printf("------\n");
@@ -73,8 +71,10 @@ int main(void)
     if (sigaction(SIGCHLD, &sa, NULL) == -1) {
         perror("sigaction");
         exit(1); }
+    
     while(true) {  // main accept() loop
         sin_size = sizeof their_addr;
+        //acception connections
         if ((new_fd = accept(sockfd, (struct sockaddr *)&their_addr, \
                              &sin_size)) == -1) {
             perror("accept");
@@ -86,52 +86,79 @@ int main(void)
         if (new_fd < 0) {
             printf("[-] Can't connect!\n");
         } else {
-            int Fork = fork();
+            int Fork = fork(); //fork for multiple clients
             if (Fork < 0) {
                 printf("[-] Issue creating a fork!\n");
             } else if (Fork == 0) {
-
                 while(true) {
-
-                    recv(new_fd, buf, MAXDATASIZE, 0);
-
-                    if (strcmp(buf, "catalog") == 0) {
-                        printf("> Client requested 'catalog'\n");
+                    recv(new_fd, buf, MAXDATASIZE, 0); //recieve menu selection
+                    
+                    if (strcmp(buf, "catalog") == 0) { //catalog
+                        printf("> Client requested 'catalog'\n"); //client request catalog
                         saved_stdout = dup(1);
                         dup2(new_fd, 1);
-                        system("ls");
+                        system("ls"); //send system ls of server directory to client
                         dup2(saved_stdout, 1);
                         close(saved_stdout);
-                        //send(new_fd, "catalog", sizeof(buf), 0);
                         continue;
-                    //break;
-                    } else if (strcmp(buf, "spwd") == 0) {
-                        printf("> Client requested 'spwd'\n");
-                        saved_stdout = dup(1);
+                    } else if (strcmp(buf, "spwd") == 0) { //spwd
+                        printf("> Client requested 'spwd'\n"); //client request spwd
+                        saved_stdout2 = dup(1);
                         dup2(new_fd, 1);
-                        system("pwd");
-                        dup2(saved_stdout, 1);
-                        close(saved_stdout);
-                        //send(new_fd, "pwd", sizeof(buf), 0);
+                        system("pwd"); //send server directory name to client
+                        dup2(saved_stdout2, 1);
+                        close(saved_stdout2);
                         continue;
-                    } else if (strcmp(buf, "ls") == 0) {
+                    } else if (strcmp(buf, "download") == 0) { //download
+                        printf("> Client requested 'download'\n"); //client request download
+                        memset(buf, 0, MAXDATASIZE); //clear 'download' in the buffer
+                        recv(new_fd, buf, MAXDATASIZE, 0); //recieve file name in the buffer
+                        printf("> Finding file name: %s\n", buf);
+                        FILE *f; 
+                        f = fopen(buf, "r"); //open new file
+                        if (f == NULL) {
+                            printf("[-] Fail. Cannot find file in server!!\n");
+                            memset(buf, 0, MAXDATASIZE); 
+                            send(new_fd, "fail", MAXDATASIZE, 0); // send fail message
+                        } else { 
+                            send(new_fd, buf, MAXDATASIZE, 0); // send the right file name
+                            printf("[+] Success. Downloading file to client...\n");
+                            fseek(f, 0, SEEK_END);
+                            rewind(f);
+                            memset(buf, 0, MAXDATASIZE);
+                            fread(buf, sizeof(char), sizeof(buf), f); //readind the file in server
+                            send(new_fd, buf, MAXDATASIZE, 0); //send data to client
+                            fclose(f);
+                        }
+                        continue;
+                    } else if (strcmp(buf, "upload") == 0) { // upload
+                        printf("> Client requested 'upload'\n"); //client request upload
+                        recv(new_fd, buf, MAXDATASIZE, 0); //destination file name has been send
+                        printf("> Uploading new file name: %s\n", buf);
+                        FILE *f;  
+                        f = fopen(buf, "w"); //open new file
+                        memset(buf, 0, MAXDATASIZE);
+                        recv(new_fd, buf, MAXDATASIZE, 0); //get data from client
+                        fprintf(f, buf); //print buffer stuff into newly created file
+                        fclose(f);
+                        printf("[+] New file uploaded.\n");
+                        continue;
+                    } else if (strcmp(buf, "ls") == 0) { // ls
                         printf("> Client requested 'ls'\n");
                         continue;
-                    } else if (strcmp(buf, "pwd") == 0) {
+                    } else if (strcmp(buf, "pwd") == 0) { // pwd
                         printf("> Client requested 'pwd'\n");
                         continue;
-                    } else if (strcmp(buf, "help") == 0) {
+                    } else if (strcmp(buf, "help") == 0) { // help
                         printf("> Client requested 'help'\n");
                         continue;
-                    } else if (strcmp(buf, "bye") == 0){
+                    } else if (strcmp(buf, "bye") == 0) { // bye
                         printf("Disconnect from: %s\n", \
-                            inet_ntoa(their_addr.sin_addr));
+                            inet_ntoa(their_addr.sin_addr)); //disconnect
                         close(new_fd);
                         break;
                     } else {
-                        printf("> Command not found!\n");
-                        //printf(buf);
-                        //printf("\nls or pwd\n");
+                        printf("> Command not found!\n"); // invalid command
                         continue;
                     }
                     

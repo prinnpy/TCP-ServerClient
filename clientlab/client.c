@@ -1,11 +1,6 @@
-//
-//  main.c
-//  client
-//
-//  Created by Hieu Nguyen on 3/20/19.
-//  Copyright © 2019 Hieu Nguyen. All rights reserved.
-//
-//  The code is based on Beej's Guide to Network Programming
+//Name: Prinn Prinyanut
+//Class: CSCI 3761
+//Description: lab 2 client
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,12 +18,13 @@ int main(int argc, char *argv[])
 {
     int sockfd, numbytes;
     char buf[MAXDATASIZE];
+    char newFile[MAXDATASIZE];
     struct hostent *he;
     struct sockaddr_in their_addr; // connector's address information
     int saved_stdout;
 
     printf("------\n");
-    printf("CLIENT\n");
+    printf("CLIENT\n"); //print out client
     printf("------\n");
 
     if (argc != 2) {
@@ -55,38 +51,82 @@ int main(int argc, char *argv[])
         perror("connect");
         exit(1); 
     }
-
-    printf("[+] Connecting to the server!\n");
+    printf("[+] Connecting to the server!\n"); //connected to server
 
     while(1){
-
-        printf("\nFor command options type: 'help'\n");
+        printf("\nFor command options type: 'help'\n"); //ask for user commnad input
         printf("> ");
-        scanf("%s", &buf[0]);
+        scanf("%s", &buf[0]); //store in buffer
+        send(sockfd, buf, MAXDATASIZE, 0); //send buffer to server
 
-        send(sockfd, buf, MAXDATASIZE, 0);
-
-        if (strcmp(buf, "catalog") == 0) {
-            if(recv(sockfd, buf, 1024, 0) < 0){
+        if (strcmp(buf, "catalog") == 0) { // catalog
+            memset(buf, 0, MAXDATASIZE);
+            if(recv(sockfd, buf, sizeof(buf), 0) < 0){ //recieve data
                 printf("\nError!! Cannot recieve data.\n");
             }else{
-                printf("%s\n", buf);
+                printf("%s", buf); //print out ls from server
             }
             continue;
-        } else if (strcmp(buf, "ls") == 0) {
-            system("ls");
+        } else if (strcmp(buf, "ls") == 0) { // ls
+            system("ls"); //print filenames in client directory
             continue;
-        } else if (strcmp(buf, "pwd") == 0) {
-            system("pwd");
+        } else if (strcmp(buf, "pwd") == 0) { // pwd
+            system("pwd"); //print client directory path
             continue;
-        } else if (strcmp(buf, "spwd") == 0) {
-            if(recv(sockfd, buf, 1024, 0) < 0){
+        } else if (strcmp(buf, "spwd") == 0) { // spwd
+            memset(buf, 0, MAXDATASIZE);
+            if(recv(sockfd, buf, sizeof(buf), 0) < 0){ //recieve data
                 printf("\nError!! Cannot recieve data.\n");
             }else{
-                printf("%s\n", buf);
+                printf("%s", buf); //print out pwd from server
             }
             continue;
-        } else if (strcmp(buf, "help") == 0) {
+        } else if (strcmp(buf, "download") == 0) { // download
+            memset(buf, 0, MAXDATASIZE);
+            printf("\nEnter download source filename:\n"); //ask for user file
+            printf("> ");
+            scanf("%s", &buf[0]);
+            send(sockfd, buf, MAXDATASIZE, 0); //send file name to server and check if it's valid
+            //open file
+            recv(sockfd, buf, MAXDATASIZE, 0); //check if fail 
+
+            if (strcmp(buf, "fail") == 0) { //if server return fail (meaning can't find file)
+                printf("[-] File not found in server.\n");
+            } else {
+                printf("\nEnter download destination filename:\n"); //ask for what name should the file be saved to
+                scanf("%s", &newFile[0]);
+                FILE *fp;
+                fp = fopen(newFile, "w"); //creating new file
+                memset(buf, 0, MAXDATASIZE);
+                recv(sockfd, buf, MAXDATASIZE, 0); //get data from server
+                fprintf(fp, buf); //print buffer stuff into newly created file
+                fclose(fp);
+                printf("[+] File downloaded.\n");
+            }
+            continue;
+        } else if (strcmp(buf, "upload") == 0) { // upload
+            printf("\nEnter upload source filename:\n"); //ask for file from client directory
+            printf("> ");
+            scanf("%s", &buf[0]); 
+            FILE *f; 
+            f = fopen(buf, "r"); //open file
+            if (f == NULL) { //check if file exist
+                printf("[-] Fail. Cannot find file in client!!\n");
+            } else {
+                printf("\nEnter upload destination filename:\n"); //ask for file name to be saved on server
+                printf("> ");
+                scanf("%s", &newFile[0]); //store des filename
+                send(sockfd, newFile, MAXDATASIZE, 0); //sending the destination name to server
+                fseek(f, 0, SEEK_END);
+                rewind(f);
+                memset(buf, 0, MAXDATASIZE);
+                fread(buf, sizeof(char), sizeof(buf), f); //read from the source file in client
+                send(sockfd, buf, MAXDATASIZE, 0); //send data to server
+                fclose(f);
+                printf("[+] File uploaded.\n");
+            }
+            continue;
+        } else if (strcmp(buf, "help") == 0) { // help
             printf("\nCommands:\n");
             printf("---------\n");
             printf("catalog - show files at the server’s current directory\n");
@@ -97,32 +137,16 @@ int main(int argc, char *argv[])
             printf("spwd - display server current directory\n");
             printf("bye - disconnect from server\n");
             continue;
-        } else if(strcmp(buf, "bye") == 0){
-            //send(sockfd, buf, strlen(buf), 0);
-            //close(clientSocket);
+        } else if(strcmp(buf, "bye") == 0){ // bye
             printf("\nDisconnected from server.\n");
             close(sockfd);
-            //memset(buf, 0, 1024);
             exit(1);
-        } else {
-            //send(sockfd, buf, strlen(buf), 0);
+        } else { //check for invalid commands
             printf("\nNot avaliable command!\n");
-            //memset(buf, 0, 1024);
             continue;
         }
-        
-        memset(buf, 0, MAXDATASIZE);
+        memset(buf, 0, MAXDATASIZE); //clear buffer
         printf("\n");
-
     }
-
-    // if ((numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) { // receiving data from server
-    //     perror("recv");
-    //     exit(1); }
-    // buf[numbytes] = '\0';
-
-    // printf("Received: %s",buf); // displaying data received from server
-    // close(sockfd); // closing the socket file (disconnect from server)
-    // printf("client: closing the socket file \n");
     return 0;
 }
