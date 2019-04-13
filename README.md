@@ -89,4 +89,12 @@ For command options type: 'help'
 - 100% working locally and on csegrid!
 
 
+---
+
+
+**Name:** Prinn Prinyanut
+
+**Instagram:** [@prinnpyn](https://www.instagram.com/prinnpyn)
+
+**Email:** prinnprinyanut@gmail.com or prinn.prinyanut@ucdenver.edu
 
