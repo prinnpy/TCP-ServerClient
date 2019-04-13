@@ -1,6 +1,6 @@
 # CSCI 3761: Network Lab 2
 
-- Upload server folder and client folder to csegrid
+- Upload both server folder and client folder to csegrid
 
 ### Server side (Run this first)
 
