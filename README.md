@@ -22,7 +22,7 @@ make
 ./client csci-gnode-01
 ```
 
-### How to run program (on client side)
+### Run program (on client side)
 
 - Show files at the client’s current directory: `ls`
 ```
