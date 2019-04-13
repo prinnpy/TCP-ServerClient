@@ -67,10 +67,10 @@ Enter download destination filename:
 For command options type: 'help'
 > upload
 
-Enter download source filename:
+Enter upload source filename:
 > [Source filename (locates in client)]
 
-Enter download destination filename:
+Enter upload destination filename:
 > [Destination filename (new file name to save in server)]
 ```
 
